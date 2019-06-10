@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+
 from GFWeather import GFWeather
 
 
@@ -16,9 +19,7 @@ def test_run():
     '''
     GFWeather().start_today_info(is_test=True)
 
+
 if __name__ == '__main__':
     # test_run()
     run()
-
-
-

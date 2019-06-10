@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+
 import os
 import time
 from datetime import datetime
@@ -12,6 +15,7 @@ import city_dict
 
 # fire the job again if it was missed within GRACE_PERIOD
 GRACE_PERIOD = 15 * 60
+
 
 class GFWeather:
     headers = {
@@ -50,7 +54,7 @@ class GFWeather:
             girlfriend_list.append(girlfriend)
 
             print_msg = f"女朋友的微信昵称：{girlfriend.get('wechat_name')}\n\t女友所在城市名称：{girlfriend.get('city_name')}\n\t" \
-                f"在一起的第一天日期：{girlfriend.get('start_date')}\n\t最后一句为：{girlfriend.get('sweet_words')}\n"
+                        f"在一起的第一天日期：{girlfriend.get('start_date')}\n\t最后一句为：{girlfriend.get('sweet_words')}\n"
             init_msg += print_msg
 
         print(u"*" * 50)
@@ -120,10 +124,11 @@ class GFWeather:
         scheduler = BlockingScheduler()
         # 每天9：30左右给女朋友发送每日一句
         scheduler.add_job(self.start_today_info, 'cron', hour=self.alarm_hour,
-                          minute=self.alarm_minute, misfire_grace_time=GRACE_PERIOD)
+                          minute=self.alarm_minute,
+                          misfire_grace_time=GRACE_PERIOD)
         # 每隔 2 分钟发送一条数据用于测试。
-#         if DEBUG:
-#             scheduler.add_job(self.start_today_info, 'interval', seconds=120)
+        #         if DEBUG:
+        #             scheduler.add_job(self.start_today_info, 'interval', seconds=120)
         scheduler.start()
 
     def start_today_info(self, is_test=False):
@@ -148,7 +153,8 @@ class GFWeather:
             city_code = girlfriend.get('city_code')
             start_date = girlfriend.get('start_date').strip()
             sweet_words = girlfriend.get('sweet_words')
-            today_msg = self.get_weather_info(dictum_msg, city_code=city_code, start_date=start_date,
+            today_msg = self.get_weather_info(dictum_msg, city_code=city_code,
+                                              start_date=start_date,
                                               sweet_words=sweet_words)
             name_uuid = girlfriend.get('name_uuid')
             wechat_name = girlfriend.get('wechat_name')
@@ -201,7 +207,8 @@ class GFWeather:
         if resp.status_code == 200:
             soup_texts = BeautifulSoup(resp.text, 'lxml')
             # 『one -个』 中的每日一句
-            every_msg = soup_texts.find_all('div', class_='fp-one-cita')[0].find('a').text
+            every_msg = soup_texts.find_all('div', class_='fp-one-cita')[
+                0].find('a').text
             return every_msg + "\n"
         print('每日一句获取失败')
         return ''
@@ -219,7 +226,8 @@ class GFWeather:
             print('每日一句获取失败')
             return None
 
-    def get_weather_info(self, dictum_msg='', city_code='101030100', start_date='2018-01-01',
+    def get_weather_info(self, dictum_msg='', city_code='101030100',
+                         start_date='2018-01-01',
                          sweet_words='From your Valentine'):
         '''
         获取天气信息。网址：https://www.sojson.com/blog/305.html
@@ -232,12 +240,14 @@ class GFWeather:
         print('获取天气信息...')
         weather_url = f'http://t.weather.sojson.com/api/weather/city/{city_code}'
         resp = requests.get(url=weather_url)
-        if resp.status_code == 200 and self.isJson(resp) and resp.json().get('status') == 200:
+        if resp.status_code == 200 and self.isJson(resp) and resp.json().get(
+                'status') == 200:
             weatherJson = resp.json()
             # 今日天气
             today_weather = weatherJson.get('data').get('forecast')[1]
             # 今日日期
-            today_time = datetime.now().strftime('%Y{y}%m{m}%d{d} %H:%M:%S').format(y='年', m='月', d='日')
+            today_time = datetime.now().strftime(
+                '%Y{y}%m{m}%d{d} %H:%M:%S').format(y='年', m='月', d='日')
             # 今日天气注意事项
             notice = today_weather.get('notice')
             # 温度
